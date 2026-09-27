@@ -24,7 +24,7 @@ bibliography: references.bib
 
 **Random Seeds:** 11, 22, 33, 44, 55
 
-**Repository:** https://github.com/deepikaavetriselvam/anly735-templates-deepikaavetriselvam
+**Repository:** https://github.com/deepikaavetriselvam/anly735-templates-deepikaavetriselvam/tree/main/replication-lab
 
 # 1. Research Claim
 
