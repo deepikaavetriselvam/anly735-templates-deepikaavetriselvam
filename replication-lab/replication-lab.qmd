@@ -1,197 +1,98 @@
 ---
 title: "Predictive AI Replication Laboratory"
 subtitle: "ANLY 735 – Research Seminar in Predictive AI"
-author: "Student Name"
-date: today
+author: "Deepikaa Vetri Selvam"
+date: 26 Sep 2026
 format:
   docx:
     toc: false
 bibliography: references.bib
 ---
-
 # Study
 
-**Article:** [Insert article title]
+**Article:** Plasticity Loss in Deep Reinforcement Learning: A Survey
 
-**Authors:** [Insert author(s)]
+**Authors:** Timo Klein, Christoph Luther, Manus McAuliffe, Lukas Miklautz, Claudia Plant, and Sebastian Tschiatschek
 
-**DOI/URL:** [Insert DOI or persistent link]
+**DOI/URL:** https://doi.org/10.48550/arXiv.2411.04832
 
-**Replication Type:** [Direct / Partial / Proxy]
+**Replication Type:** Proxy Replication
 
-**Computational Environment:** [R / Python]
+**Computational Environment:** Python 3.13.15 (Windows; CPU)
 
-**Primary Packages:** [List major packages]
+**Primary Packages:** PyTorch 2.14.0+cpu, NumPy 2.5.3, Pandas 3.0.6, Matplotlib 3.11.2
 
-**Random Seed:** [Insert seed, if applicable]
+**Random Seeds:** 11, 22, 33, 44, 55
 
-**Repository:** [Insert GitHub repository URL]
+**Repository:** https://github.com/deepikaavetriselvam/anly735-templates-deepikaavetriselvam
 
 # 1. Research Claim
 
-## What result are you attempting to reproduce?
+Klein et al. [-@klein2024plasticity] describe plasticity as a neural network's capacity to adapt efficiently as the data it encounters changes. This capacity is especially important in deep reinforcement learning because the agent's own learning continually changes its data distribution. Plasticity loss therefore concerns more than a temporary decrease in performance: a previously trained network can become less effective at learning from subsequent experience. The survey connects this problem to several challenges in deep RL and emphasizes the importance of measuring adaptation rather than relying only on current task performance. In this replication, I focus on that narrower claim: prior training history can alter how effectively a neural network learns after the underlying task changes.
 
-Identify one important empirical or computational claim from the assigned paper.
-
-State:
-
-- the result or finding being examined;
-- the model or analytical approach associated with it;
-- the evaluation metric(s) used by the authors; and
-- why this result is important to the paper's contribution.
-
-Cite the original study.
-
-[Write approximately 100–150 words.]
 
 # 2. Replication Strategy
 
-## How will you investigate the claim?
-
-Identify your replication as:
-
-- **Direct** — using the original data/code;
-- **Partial** — using some original materials; or
-- **Proxy** — using comparable data and methods when original materials are unavailable.
-
-Briefly explain:
-
-- what materials are available;
-- what you will reproduce;
-- what must differ from the original study; and
-- why your approach provides a meaningful test or learning experience.
-
-[Write approximately 100–150 words.]
+I used a proxy replication rather than attempting to reproduce a full deep reinforcement learning environment. The experiment isolates the learning behavior that is central to the plasticity question. A multilayer neural network was first trained on Task A for 150 epochs. The target function was then changed to Task B while the input distribution, network architecture, optimizer, and training budget were held constant. I compared this continued learner with a newly initialized network trained directly on Task B. Five random seeds were used to reduce dependence on a single initialization. Plasticity was evaluated from the post-change learning trajectory, early rate of error reduction, final Task-B error, and attainment of a predefined performance threshold. Task-A performance before and after adaptation was also measured to examine retention.
 
 # 3. Data
 
-Describe the data used for the replication.
-
-Include:
-
-- data source;
-- unit of analysis;
-- target/outcome variable;
-- important predictors/features;
-- sample size, when applicable;
-- preprocessing decisions; and
-- important differences from the original data.
-
-Do not include restricted, confidential, or personally identifiable data in the repository.
-
-[Write approximately 100–150 words.]
+This proxy replication used synthetic regression data generated within the Python experiment rather than data from a reinforcement-learning environment. Each observation contained two continuous input features, independently sampled from a uniform distribution between -2 and 2. I generated 1,200 observations for training and 600 independent observations for testing for each random seed. Task A and Task B used the same input distribution but different nonlinear target functions, allowing the experimental change to occur in the input-output relationship rather than in the predictors themselves. No missing-value treatment, scaling, or other preprocessing was required. The unit of analysis was one synthetic observation, and the outcome was a continuous target value. This simplified dataset differs substantially from the sequential, policy-dependent experience encountered in deep reinforcement learning, but it provides a controlled setting for examining changes in subsequent learning behavior.
 
 # 4. Method
 
-Describe the computational approach used in your replication.
-
-Include, as appropriate:
-
-- model or algorithm;
-- train/test or validation strategy;
-- baseline/comparison model;
-- hyperparameters;
-- preprocessing or feature engineering;
-- random seed; and
-- software/packages used.
-
-The goal is to provide enough information for another researcher to understand how the analysis was conducted.
-
-[Write approximately 150–200 words.]
+I implemented a feedforward neural network in PyTorch with two input units, two hidden layers of 64 units each with ReLU activation, and one continuous output. The model was optimized with Adam using a learning rate of 0.01 and mean squared error (MSE) as the loss function. For each of five random seeds (11, 22, 33, 44, and 55), a continued model was first trained on Task A for 150 epochs and then trained on Task B for another 150 epochs. A freshly initialized model with the same architecture, optimizer, Task-B data, and training budget served as the comparison condition. Performance was evaluated on an independent test set after every post-change epoch. I measured Task-B MSE, the early log-MSE slope over the first 20 post-change epochs, final error, and whether each model reached a threshold defined as 110% of the fresh learner's final Task-B MSE. Task-A test MSE before and after adaptation was also recorded to quantify retention. All experiments were run on CPU using Python 3.13.15 and PyTorch 2.14.0.
 
 # 5. Results
 
-Present the main results of your replication.
+![Post-change Task-B learning trajectories for the continued and fresh learners across five random seeds. Lines show mean test MSE and shaded regions show ±1 standard deviation.](figures/post_change_learning.png)
 
-Include at least one appropriate:
-
-- table,
-- figure, or
-- model-performance summary
-
-generated directly from your analysis when appropriate.
-
-Report the same evaluation metric used by the original authors whenever possible.
-
-Do not simply present output. Explain what the result means.
-
-[Insert results and approximately 100–150 words of interpretation.]
+The continued model remained capable of learning Task B, reducing mean test MSE from 2.85801 immediately after the change to 0.00212 after 150 epochs. However, the fresh learner adapted more rapidly: its mean early log-MSE slope was -0.16801 compared with -0.12560 for the continued learner, where a more negative value indicates faster proportional error reduction. The fresh learner also reached the predefined Task-B performance threshold in all five seeds, whereas the continued learner reached it in only one of five seeds within the training budget. Retention was poor: mean Task-A MSE increased from 0.00057 before the change to 2.85592 after Task-B adaptation. Thus, the change did not merely cause an immediate performance drop; prior training was associated with slower and less reliable subsequent learning.
 
 # 6. Compare
 
 ## How closely did your results align with the original study?
 
-Compare your result with the authors' reported result.
-
 | Evidence | Original Study | Replication |
-|---|---:|---:|
-| Primary metric | [value] | [value] |
-| Secondary metric, if applicable | [value] | [value] |
+|---|---|---|
+| Final-task learning | Plasticity loss is defined through poorer final-task loss relative to a freshly initialized model | Continued: MSE = 0.00212; Fresh: MSE = 0.00148 |
+| Subsequent learning behavior | Prior training can reduce the ability to fit new targets | Early log-MSE slope: -0.12560 continued vs. -0.16801 fresh |
+| Threshold attainment | Not directly comparable across the surveyed studies | Continued: 1/5 seeds; Fresh: 5/5 seeds |
 
-Then interpret the comparison.
-
-Consider:
-
-- Was the result reproduced?
-- Was the direction of the finding consistent?
-- Was model performance similar?
-- What might explain differences?
-
-For proxy replications, focus on whether the analytical pattern or methodological insight was reproduced rather than expecting identical numerical results.
-
-[Write approximately 150–200 words.]
+The replication reproduced the qualitative pattern emphasized by Klein et al. rather than a directly comparable numerical result. After Task A training, the continued network was still able to learn Task B, but its final Task-B error remained higher than that of a freshly initialized network. The learning trajectories added another useful diagnostic: the fresh network showed a faster proportional reduction in error and reached the predefined threshold in every seed, whereas the continued network did so in only one seed. This pattern is consistent with reduced plasticity after prior training. However, the magnitude of the effect cannot be compared directly with the surveyed deep-RL evidence because my experiment used synthetic supervised regression rather than sequential reinforcement learning. The result should therefore be interpreted as evidence that the same learning-capacity pattern can emerge in a simplified controlled setting, not as a numerical reproduction of a particular deep-RL experiment.
 
 # 7. Reproducibility Check
 
-Evaluate the reproducibility of the original study and your own analysis.
-
-- [ ] Data source documented
-- [ ] Code runs from beginning to end
-- [ ] Computational environment identified
-- [ ] Software/packages documented
-- [ ] Package versions documented when relevant
-- [ ] Random seed documented when applicable
-- [ ] Key preprocessing steps documented
-- [ ] Evaluation procedure documented
-- [ ] Repository README provides reproduction instructions
+- [x] Data source documented
+- [x] Code runs from beginning to end
+- [x] Computational environment identified
+- [x] Software/packages documented
+- [x] Package versions documented when relevant
+- [x] Random seed documented when applicable
+- [x] Key preprocessing steps documented
+- [x] Evaluation procedure documented
+- [x] Repository README provides reproduction instructions
 
 **What was the greatest reproducibility challenge you encountered?**
 
-[Write approximately 75–100 words.]
+The greatest challenge was translating a broad plasticity-loss construct from deep reinforcement learning into a small, reproducible proxy experiment. The assigned article is a survey that synthesizes multiple definitions, metrics, environments, and mitigation strategies rather than providing one experiment that could simply be rerun. I therefore had to operationalize plasticity explicitly by comparing a previously trained network with a fresh network after a controlled task change. This also required separating an immediate performance drop from a change in subsequent learning capacity. Recording learning trajectories, early learning rates, threshold attainment, and retention made that distinction more reproducible and transparent.
 
 # 8. Extend
 
 ## What did the replication reveal that you would investigate next?
 
-Propose **one** meaningful extension.
-
-Examples might include:
-
-- testing another model;
-- adding a stronger baseline;
-- evaluating another population or dataset;
-- examining temporal generalization;
-- testing fairness across groups;
-- evaluating model calibration;
-- examining interpretability; or
-- testing robustness under changing conditions.
-
-Explain why the extension would add knowledge rather than merely add complexity.
-
-[Write approximately 100–150 words.]
+A useful extension would be to replace the single Task A-to-Task B transition with a sequence of changing target functions while keeping the architecture and training budget constant. After each transition, I would compare the previously trained network with a freshly initialized network and measure early learning rate, final error, and time to a common performance criterion. This would test whether the learning-rate difference observed in my proxy experiment is a one-time consequence of the first task transition or whether plasticity progressively deteriorates as training history accumulates. I would also evaluate performance on earlier tasks after every transition to track retention alongside new learning. This extension would add knowledge by showing how stability and plasticity evolve over time rather than measuring them at only one point.
 
 # Replication Verdict
 
-Select the statement that best represents your findings:
-
 - [ ] **Reproduced** — The central result was substantially reproduced.
-- [ ] **Partially Reproduced** — Some findings were reproduced, but meaningful differences remain.
+- [x] **Partially Reproduced** — Some findings were reproduced, but meaningful differences remain.
 - [ ] **Not Reproduced** — The central result was not reproduced.
 - [ ] **Not Directly Comparable** — A proxy replication produced useful methodological insight, but numerical comparison is not appropriate.
 
 In **2–3 sentences**, defend your verdict.
 
-[Write here.]
+The proxy experiment partially reproduced the expected plasticity-loss pattern because the previously trained network learned the new task more slowly and reached the performance threshold less consistently than the freshly initialized network. However, the continued learner still successfully reduced its Task-B error, and the experiment used synthetic supervised regression rather than the deep reinforcement-learning settings discussed in the assigned paper. Therefore, the findings support the qualitative pattern but should not be interpreted as a direct numerical reproduction.
 
 # References
 

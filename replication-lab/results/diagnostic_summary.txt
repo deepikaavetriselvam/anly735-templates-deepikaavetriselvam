@@ -1,0 +1,34 @@
+ANLY 735 Replication Laboratory #2
+Stability-Plasticity Diagnostic
+
+Seeds: 11, 22, 33, 44, 55
+
+CHANGE
+The target mapping changed from Task A to Task B while the input distribution remained fixed.
+
+RETENTION
+Mean Task A MSE before change: 0.00057
+Mean Task A MSE after Task B adaptation: 2.85592
+
+NEW LEARNING
+Continued learner Task B initial MSE: 2.85801
+Continued learner Task B final MSE: 0.00212
+Fresh learner Task B initial MSE: 0.90819
+Fresh learner Task B final MSE: 0.00148
+
+RATE
+Continued learner mean early log-MSE slope: -0.12560
+Fresh learner mean early log-MSE slope: -0.16801
+More negative values indicate faster proportional error reduction.
+
+THRESHOLD
+Threshold definition: 110% of each seed's fresh learner final Task B MSE.
+Continued learner reached threshold: 1/5 seeds
+Fresh learner reached threshold: 5/5 seeds
+
+INTERPRETATION
+Prior training did not eliminate the network's ability to learn Task B.
+However, the continued learner showed slower early adaptation, a slightly
+higher final Task B error, and substantially less reliable attainment of
+the prespecified performance threshold than the fresh learner. Adaptation
+to Task B was also accompanied by substantial loss of Task A performance.

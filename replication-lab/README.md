@@ -69,3 +69,27 @@ When data cannot be redistributed, document how an authorized researcher can obt
 ## Guiding Principle
 
 Do not chase identical numbers. Investigate reproducibility.
+
+## Replication Laboratory #2: Plasticity-Loss Proxy Experiment
+
+This repository contains a proxy replication examining whether prior training changes a neural network's ability to learn after the target relationship changes. A continued learner is first trained on Task A and subsequently adapted to Task B. Its post-change learning behavior is compared with a freshly initialized network trained on Task B.
+
+### Computational Environment
+
+- Python 3.13.15
+- PyTorch 2.14.0+cpu
+- NumPy 2.5.3
+- Pandas 3.0.6
+- Matplotlib 3.11.2
+- Windows, CPU execution
+
+The exact Python dependencies used for the experiment are recorded in `requirements.txt`.
+
+### Reproducing the Experiment
+
+From the `replication-lab` directory, create and activate a Python virtual environment and install the recorded dependencies:
+
+```powershell
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
+python -m pip install -r requirements.txt
